@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marrakech Éco-Guide IA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            terracotta: '#C8553D',
+            terracottaLight: '#D4765F',
+            sable: '#F5F0E8',
+            sableDark: '#E8E0D0',
+            dark: '#1a1a1a',
+            cream: '#FAF8F5',
+          },
+          fontFamily: {
+            display: ['"Playfair Display"', 'serif'],
+            body: ['Montserrat', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    :root {
+      --terracotta: #C8553D;
+      --sable: #F5F0E8;
+      --dark: #1a1a1a;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Montserrat', sans-serif; background: var(--sable); color: var(--dark); overflow-x: hidden; }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--sable); }
+    ::-webkit-scrollbar-thumb { background: var(--terracotta); border-radius: 4px; }
+
+    /* ── Navbar ── */
+    .navbar {
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background: transparent;
+    }
+    .navbar.scrolled {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 1px 20px rgba(0,0,0,0.08);
+    }
+    .navbar.scrolled .nav-logo-text { color: var(--dark); }
+    .navbar.scrolled .nav-link { color: var(--dark); }
+    .navbar.scrolled .nav-link:hover { color: var(--terracotta); }
+
+    .nav-link {
+      position: relative;
+      transition: color 0.3s;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 1.5px;
+      background: var(--terracotta);
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav-link:hover::after { width: 100%; }
+
+    /* ── Hero with high-quality local image ── */
+    .hero {
+      position: relative;
+      height: 100vh;
+      min-height: 700px;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: url('./image.png') center center / cover no-repeat;
+      will-change: transform;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(26,26,26,0.25) 0%, rgba(26,26,26,0.45) 50%, rgba(26,26,26,0.75) 100%);
+    }
+    .hero-content { position: relative; z-index: 10; }
+
+    /* ── Background image sections ── */
+    .bg-section {
+      position: relative;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
+    .bg-section-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(26,26,26,0.55);
+    }
+    .bg-section-content {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* ── Reveal animations ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: all 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ── Split sections ── */
+    .split-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+    }
+    @media (max-width: 768px) {
+      .split-section { grid-template-columns: 1fr; }
+    }
+
+    .split-img-wrapper {
+      position: relative;
+      overflow: hidden;
+      height: 100%;
+      min-height: 500px;
+    }
+    .split-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .split-section:hover .split-img-wrapper img {
+      transform: scale(1.08);
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+      margin-bottom: 1.5rem;
+    }
+    .section-label .line {
+      width: 40px;
+      height: 1px;
+      background: var(--terracotta);
+    }
+
+    /* ── Cards ── */
+    .card-luxe {
+      background: white;
+      border-radius: 2px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-luxe:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 48px rgba(0,0,0,0.12);
+    }
+    .card-luxe .card-img-wrap {
+      overflow: hidden;
+      position: relative;
+    }
+    .card-luxe .card-img-wrap img {
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+    }
+    .card-luxe:hover .card-img-wrap img {
+      transform: scale(1.1);
+    }
+    .card-luxe .card-img-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(26,26,26,0.5) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .card-luxe:hover .card-img-overlay { opacity: 1; }
+
+    /* ── Masonry Gallery ── */
+    .masonry-grid {
+      column-count: 3;
+      column-gap: 12px;
+    }
+    @media (max-width: 768px) {
+      .masonry-grid { column-count: 2; }
+    }
+    @media (max-width: 480px) {
+      .masonry-grid { column-count: 1; }
+    }
+    .masonry-item {
+      break-inside: avoid;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .masonry-item img {
+      width: 100%;
+      display: block;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), filter 0.4s;
+    }
+    .masonry-item:hover img {
+      transform: scale(1.05);
+      filter: brightness(0.85);
+    }
+    .masonry-item .masonry-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 24px 16px 16px;
+      background: linear-gradient(to top, rgba(26,26,26,0.8), transparent);
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .masonry-item:hover .masonry-caption {
+      transform: translateY(0);
+    }
+
+    /* ── Form ── */
+    .form-luxe input,
+    .form-luxe select,
+    .form-luxe textarea {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1.5px solid #e0d8cc;
+      border-radius: 2px;
+      background: white;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      color: var(--dark);
+    }
+    .form-luxe input:focus,
+    .form-luxe select:focus,
+    .form-luxe textarea:focus {
+      outline: none;
+      border-color: var(--terracotta);
+      box-shadow: 0 0 0 3px rgba(200, 85, 61, 0.1);
+    }
+    .form-luxe label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      color: #666;
+    }
+
+    /* ── Tag chips ── */
+    .tag-luxe {
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border: 1.5px solid #d4ccc0;
+      color: #666;
+      background: transparent;
+      border-radius: 2px;
+      padding: 8px 18px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      user-select: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tag-luxe.active {
+      background: var(--terracotta);
+      border-color: var(--terracotta);
+      color: white;
+    }
+    .tag-luxe:hover { border-color: var(--terracotta); color: var(--terracotta); }
+    .tag-luxe.active:hover { color: white; }
+
+    /* ── Custom checkbox ── */
+    .check-luxe { display:flex; align-items:center; gap:.7rem; cursor:pointer; }
+    .check-luxe input { appearance:none; width:18px; height:18px; border:2px solid #d4ccc0;
+      border-radius:3px; background:transparent; cursor:pointer; transition:all .2s; flex-shrink:0; }
+    .check-luxe input:checked {
+      background: var(--terracotta);
+      border-color: var(--terracotta);
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4L3.5 6.5L9 1' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 10px 8px;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 36px;
+      background: var(--terracotta);
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      border: none;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.15);
+      transform: translateX(-100%);
+      transition: transform 0.5s;
+    }
+    .btn-primary:hover::before { transform: translateX(0); }
+    .btn-primary:hover {
+      background: #B34A35;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(200, 85, 61, 0.3);
+    }
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 32px;
+      background: transparent;
+      color: var(--dark);
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      border: 1.5px solid var(--dark);
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.4s;
+    }
+    .btn-outline:hover {
+      background: var(--dark);
+      color: white;
+    }
+
+    /* ── Loader ── */
+    .loader-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(245, 240, 232, 0.95);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .loader-overlay.active { display: flex; }
+    .loader-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--dark);
+      margin-top: 24px;
+    }
+    .loader-sub {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 8px;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 2px solid rgba(200, 85, 61, 0.2);
+      border-top-color: var(--terracotta);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Results ── */
+    .results-section { display: none; }
+    .results-section.active {
+      display: block;
+      animation: fadeInUp 0.8s ease forwards;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Eco score ── */
+    .eco-score-bar {
+      height: 3px;
+      background: #e0d8cc;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .eco-score-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--terracotta), #D4765F);
+      transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ── Decorative line ── */
+    .deco-line {
+      width: 60px;
+      height: 2px;
+      background: var(--terracotta);
+    }
+
+    /* ── Map placeholder ── */
+    .map-frame {
+      position: relative;
+      height: 450px;
+      background: linear-gradient(135deg, #e8e0d0 0%, #d4ccc0 100%);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .map-frame::after {
+      content: "Carte interactive de l'itinéraire";
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: #888;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── Mobile menu ── */
+    .mobile-menu {
+      position: fixed;
+      inset: 0;
+      background: white;
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .mobile-menu.open { transform: translateX(0); }
+
+    .hamburger {
+      width: 24px;
+      height: 18px;
+      position: relative;
+      cursor: pointer;
+    }
+    .hamburger span {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: currentColor;
+      transition: all 0.3s;
+    }
+    .hamburger span:nth-child(1) { top: 0; }
+    .hamburger span:nth-child(2) { top: 8px; }
+    .hamburger span:nth-child(3) { top: 16px; }
+    .hamburger.active span:nth-child(1) { top: 8px; transform: rotate(45deg); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { top: 8px; transform: rotate(-45deg); }
+
+    /* ── Photo background sections ── */
+    .photo-bg-section {
+      position: relative;
+      min-height: 500px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+    .photo-bg-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(26,26,26,0.5);
+    }
+
+    /* ── Full-width image banner ── */
+    .img-banner {
+      width: 100%;
+      height: 500px;
+      object-fit: cover;
+      display: block;
+    }
+  </style>
+<base target="_blank">
+</head>
+<body>
+
+<!-- ═══════════════════════════════ NAVBAR ═══════════════════════════════ -->
+<nav class="navbar fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-5 flex items-center justify-between">
+  <a href="#" class="flex items-center gap-3">
+    <div class="w-9 h-9 rounded-full flex items-center justify-center" style="background: var(--terracotta);">
+      <svg viewBox="0 0 24 24" class="w-4 h-4 fill-white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+    </div>
+    <span class="nav-logo-text font-display font-semibold text-white text-lg tracking-wide transition-colors">Marrakech <span style="color: var(--terracotta);">Trip</span></span>
+  </a>
+
+  <div class="hidden md:flex items-center gap-8">
+    <a href="#about" class="nav-link text-white text-sm font-medium">À propos</a>
+    <a href="#itineraire" class="nav-link text-white text-sm font-medium">Itinéraire</a>
+    <a href="#galerie" class="nav-link text-white text-sm font-medium">Galerie</a>
+    <a href="#services" class="nav-link text-white text-sm font-medium">Services</a>
+    <a href="#itineraire" class="btn-primary text-sm py-3 px-6">Explorer</a>
+  </div>
+
+  <div class="md:hidden hamburger text-white" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#about" class="text-2xl font-display" onclick="toggleMenu()">À propos</a>
+  <a href="#itineraire" class="text-2xl font-display" onclick="toggleMenu()">Itinéraire</a>
+  <a href="#galerie" class="text-2xl font-display" onclick="toggleMenu()">Galerie</a>
+  <a href="#services" class="text-2xl font-display" onclick="toggleMenu()">Services</a>
+  <a href="#itineraire" class="btn-primary mt-4" onclick="toggleMenu()">Explorer</a>
+</div>
+
+<!-- ═══════════════════════════════ HERO (image.png en background haute qualité) ═══════════════════════════════ -->
+<section class="hero flex items-center justify-center" id="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-overlay"></div>
+
+  <div class="hero-content text-center px-6 max-w-4xl mx-auto">
+    <div class="reveal">
+      <div class="section-label justify-center text-white/80 mb-6">
+        <span class="line" style="background: rgba(255,255,255,0.4);"></span>
+        <span>Tourisme Responsable · Marrakech</span>
+        <span class="line" style="background: rgba(255,255,255,0.4);"></span>
+      </div>
+    </div>
+    <h1 class="reveal reveal-delay-1 font-display text-5xl md:text-7xl lg:text-8xl text-white font-medium leading-tight mb-6">
+      La Ville Rouge<br/><em class="italic" style="color: var(--terracotta);">à votre image</em>
+    </h1>
+    <p class="reveal reveal-delay-2 text-white/70 text-base md:text-lg font-body max-w-2xl mx-auto leading-relaxed mb-10">
+      Découvrez Marrakech autrement. Notre IA conçoit un itinéraire éco-responsable sur mesure, 
+      entre traditions, saveurs et ambiance unique.
+    </p>
+    <div class="reveal reveal-delay-3 flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="#itineraire" class="btn-primary text-base py-4 px-8">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Créer mon itinéraire
+      </a>
+      <a href="#galerie" class="btn-outline text-white border-white/50 hover:bg-white hover:text-dark">
+        Découvrir la ville
+      </a>
+    </div>
+  </div>
+
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 opacity-60">
+    <span class="text-white text-xs tracking-widest uppercase">Scroll</span>
+    <div class="w-px h-12 bg-white/40 relative overflow-hidden">
+      <div class="absolute top-0 left-0 w-full bg-white animate-bounce" style="height: 20px; animation-duration: 2s;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ ABOUT SPLIT (image(10).png) ═══════════════════════════════ -->
+<section class="split-section" id="about">
+  <div class="p-12 md:p-20 lg:p-24 flex flex-col justify-center reveal" style="background: white;">
+    <div class="section-label">
+      <span class="line"></span>
+      <span>À Propos</span>
+    </div>
+    <h2 class="font-display text-4xl md:text-5xl font-medium mb-6 leading-tight">
+      Explorez, Réservez,<br/><em class="italic" style="color: var(--terracotta);">profitez !</em>
+    </h2>
+    <p class="text-gray-600 leading-relaxed mb-6 text-sm md:text-base">
+      Que vous soyez en voyage ou résident, profitez de nos sélections pour vivre Marrakech autrement — 
+      entre traditions, saveurs et ambiance unique.
+    </p>
+    <p class="text-gray-500 leading-relaxed mb-8 text-sm">
+      Découvrez les souks colorés et leur artisanat authentique, flânez dans les ruelles parfumées 
+      de la médina, savourez une cuisine marocaine aux mille épices.
+    </p>
+    <div class="flex items-center gap-4">
+      <div class="deco-line"></div>
+      <span class="text-xs font-semibold tracking-widest uppercase text-gray-400">Marrakech Éco-Guide</span>
+    </div>
+  </div>
+  <div class="split-img-wrapper reveal">
+    <img src="./image(10).png" alt="Ruelle de la Médina" loading="lazy" />
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ FULL-WIDTH BANNER (image(2).png Jemaa el-Fna nuit) ═══════════════════════════════ -->
+<section class="relative">
+  <img src="./image(2).png" alt="Jemaa el-Fna la nuit" class="img-banner" loading="lazy" />
+  <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+  <div class="absolute bottom-12 left-12 right-12">
+    <div class="max-w-xl">
+      <span class="text-xs font-semibold tracking-widest uppercase text-white/60 mb-3 block">Nuit à Marrakech</span>
+      <h3 class="font-display text-3xl md:text-4xl text-white font-medium">Place Jemaa el-Fna</h3>
+      <p class="text-white/70 text-sm mt-3 leading-relaxed">Le cœur battant de la Médina, classé UNESCO. Une ambiance unique entre conteurs, musiciens et marchands d'épices.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ ITINÉRAIRE FORM ═══════════════════════════════ -->
+<section class="py-24 md:py-32 px-6 md:px-12" id="itineraire" style="background: white;">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <div class="section-label justify-center">
+        <span class="line"></span>
+        <span>Votre Itinéraire Personnalisé</span>
+        <span class="line"></span>
+      </div>
+      <h2 class="font-display text-4xl md:text-5xl font-medium mb-4">Séjours à la carte</h2>
+      <p class="text-gray-500 max-w-xl mx-auto text-sm">
+        Remplissez vos préférences et laissez notre IA créer un circuit éco-responsable unique, 
+        adapté à votre rythme et vos envies.
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-5 gap-12 items-start">
+      <!-- Left: Form -->
+      <div class="md:col-span-3 reveal">
+        <form id="itinerary-form" class="form-luxe space-y-6" onsubmit="handleGenerate(event)">
+
+          <div class="grid md:grid-cols-2 gap-6">
+            <div>
+              <label>Durée du séjour</label>
+              <select id="duration" required>
+                <option value="">— Choisir —</option>
+                <option value="2h">½ journée (2–3h)</option>
+                <option value="1j">1 journée complète</option>
+                <option value="2j">Week-end (2 jours)</option>
+                <option value="3j">3 jours</option>
+                <option value="5j">5 jours (séjour)</option>
+              </select>
+            </div>
+            <div>
+              <label>Type de voyage</label>
+              <select id="tripType">
+                <option value="">— Optionnel —</option>
+                <option value="solo">Solo</option>
+                <option value="couple">En couple</option>
+                <option value="famille">En famille</option>
+                <option value="groupe">Groupe d'amis</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="mb-3">Centres d'intérêt</label>
+            <div class="flex flex-wrap gap-2" id="interest-tags">
+              <span class="tag-luxe" onclick="toggleTag(this,'Architecture')">🕌 Architecture</span>
+              <span class="tag-luxe" onclick="toggleTag(this,'Gastronomie')">🍊 Gastronomie</span>
+              <span class="tag-luxe" onclick="toggleTag(this,'Artisanat')">🪬 Artisanat</span>
+              <span class="tag-luxe" onclick="toggleTag(this,'Nature')">🌿 Nature</span>
+              <span class="tag-luxe" onclick="toggleTag(this,'Histoire')">📜 Histoire</span>
+              <span class="tag-luxe" onclick="toggleTag(this,'Bien-être')">♨️ Bien-être</span>
+              <span class="tag-luxe" onclick="toggleTag(this,'Photographie')">📷 Photo</span>
+              <span class="tag-luxe" onclick="toggleTag(this,'Souk')">🛒 Souks</span>
+            </div>
+          </div>
+
+          <div>
+            <label class="mb-3">Accessibilité & Besoins</label>
+            <div class="grid sm:grid-cols-2 gap-3">
+              <label class="check-luxe p-4 border border-gray-200 rounded hover:border-terracotta transition-colors">
+                <input type="checkbox" id="mobility" />
+                <span class="text-sm text-gray-600">♿ Mobilité réduite</span>
+              </label>
+              <label class="check-luxe p-4 border border-gray-200 rounded hover:border-terracotta transition-colors">
+                <input type="checkbox" id="shade" />
+                <span class="text-sm text-gray-600">☂️ Besoin d'ombre</span>
+              </label>
+              <label class="check-luxe p-4 border border-gray-200 rounded hover:border-terracotta transition-colors">
+                <input type="checkbox" id="allergies" />
+                <span class="text-sm text-gray-600">🌸 Allergies</span>
+              </label>
+              <label class="check-luxe p-4 border border-gray-200 rounded hover:border-terracotta transition-colors">
+                <input type="checkbox" id="family" />
+                <span class="text-sm text-gray-600">👨‍👩‍👧 Voyage famille</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="pt-4">
+            <button type="submit" id="generate-btn" class="btn-primary w-full md:w-auto text-base py-4 px-10">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              Générer mon itinéraire
+            </button>
+            <p class="text-xs text-gray-400 mt-3">✨ Gratuit · Sans compte · Réponse instantanée</p>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right: Image (image(3).png) -->
+      <div class="md:col-span-2 reveal reveal-delay-2">
+        <div class="relative overflow-hidden rounded" style="aspect-ratio: 3/4;">
+          <img src="./image(3).png" alt="Architecture Marrakech" class="w-full h-full object-cover" loading="lazy" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+          <div class="absolute bottom-6 left-6 right-6">
+            <p class="text-white font-display text-lg italic">"L'âme de Marrakech réside dans ses détails"</p>
+            <p class="text-white/60 text-xs mt-2">— Médina, XII<sup>e</sup> siècle</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ PHOTO BACKGROUND SECTION (image(4).png Jemaa el-Fna jour) ═══════════════════════════════ -->
+<section class="photo-bg-section" style="background-image: url('./image(4).png');">
+  <div class="photo-bg-overlay"></div>
+  <div class="photo-bg-content text-center px-6 py-24 max-w-3xl mx-auto">
+    <div class="reveal">
+      <div class="section-label justify-center text-white/70 mb-6">
+        <span class="line" style="background: rgba(255,255,255,0.4);"></span>
+        <span>Patrimoine UNESCO</span>
+        <span class="line" style="background: rgba(255,255,255,0.4);"></span>
+      </div>
+      <h2 class="font-display text-4xl md:text-6xl text-white font-medium mb-6">Au cœur de la Médina</h2>
+      <p class="text-white/70 text-base md:text-lg leading-relaxed">
+        Flânez dans les ruelles parfumées, découvrez les riads cachés et laissez-vous envoûter 
+        par la magie des souks millénaires.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ RÉSULTATS ═══════════════════════════════ -->
+<section class="results-section py-24 md:py-32 px-6 md:px-12" id="results-section" style="background: var(--sable);">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+      <div class="reveal">
+        <div class="section-label">
+          <span class="line"></span>
+          <span>Votre Circuit</span>
+        </div>
+        <h2 class="font-display text-4xl md:text-5xl font-medium">Éco-Responsable</h2>
+        <p class="text-gray-500 mt-2 text-sm" id="results-subtitle"></p>
+      </div>
+      <button onclick="resetForm()" class="btn-outline self-start">
+        ← Modifier mes préférences
+      </button>
+    </div>
+
+    <div id="results-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+      <!-- Injected by JS -->
+    </div>
+
+    <!-- Map -->
+    <div class="reveal mb-16">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-display text-2xl">Carte de l'itinéraire</h3>
+        <span class="text-xs font-semibold tracking-widest uppercase text-gray-400">Marrakech, Maroc</span>
+      </div>
+      <div class="map-frame"></div>
+    </div>
+
+    <!-- Eco summary -->
+    <div class="reveal p-8 md:p-12 rounded" style="background: white;">
+      <div class="flex items-start gap-6">
+        <div class="w-14 h-14 rounded-full flex items-center justify-center text-2xl flex-shrink-0" style="background: var(--sable);">
+          🌿
+        </div>
+        <div>
+          <h3 class="font-display text-xl mb-2">Bilan Éco-Responsable</h3>
+          <p class="text-gray-600 text-sm leading-relaxed mb-4" id="eco-summary">
+            Votre circuit a été optimisé pour minimiser l'empreinte carbone tout en maximisant l'expérience locale.
+          </p>
+          <div class="flex flex-wrap gap-3" id="eco-stats">
+            <span class="px-4 py-2 rounded text-xs font-semibold" style="background: var(--sable); color: var(--terracotta);">🚶 100% à pied</span>
+            <span class="px-4 py-2 rounded text-xs font-semibold" style="background: var(--sable); color: var(--terracotta);">🏪 Artisans locaux</span>
+            <span class="px-4 py-2 rounded text-xs font-semibold" style="background: var(--sable); color: var(--terracotta);">💧 Points eau indiqués</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ PHOTO BACKGROUND SECTION 2 (image(1).png Souks) ═══════════════════════════════ -->
+<section class="photo-bg-section" style="background-image: url('./image(1).png');">
+  <div class="photo-bg-overlay"></div>
+  <div class="photo-bg-content text-center px-6 py-24 max-w-3xl mx-auto">
+    <div class="reveal">
+      <div class="section-label justify-center text-white/70 mb-6">
+        <span class="line" style="background: rgba(255,255,255,0.4);"></span>
+        <span>Artisanat Authentique</span>
+        <span class="line" style="background: rgba(255,255,255,0.4);"></span>
+      </div>
+      <h2 class="font-display text-4xl md:text-6xl text-white font-medium mb-6">Les Souks Colorés</h2>
+      <p class="text-white/70 text-base md:text-lg leading-relaxed">
+        Chaque boutique raconte sa propre histoire, mêlant charme local et authenticité. 
+        Plongez au cœur des récits qui font la magie de la Ville Rouge.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ GALERIE MASONRY ═══════════════════════════════ -->
+<section class="py-24 md:py-32 px-6 md:px-12" id="galerie" style="background: white;">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <div class="section-label justify-center">
+        <span class="line"></span>
+        <span>Galerie Photo</span>
+        <span class="line"></span>
+      </div>
+      <h2 class="font-display text-4xl md:text-5xl font-medium">Marrakech en images</h2>
+      <p class="text-gray-500 mt-3 max-w-lg mx-auto text-sm">
+        Plongez dans l'atmosphère unique de la Ville Rouge à travers nos clichés.
+      </p>
+    </div>
+
+    <div class="masonry-grid reveal">
+      <div class="masonry-item">
+        <img src="./image(5).png" alt="Épices en cônes" loading="lazy" />
+        <div class="masonry-caption">🌶️ Épices en cônes · Souks</div>
+      </div>
+      <div class="masonry-item">
+        <img src="./image(6).png" alt="Herbes" loading="lazy" />
+        <div class="masonry-caption">🌿 Herbes & épices</div>
+      </div>
+      <div class="masonry-item">
+        <img src="./image(7).png" alt="Textiles" loading="lazy" />
+        <div class="masonry-caption">🧵 Textiles & tapis</div>
+      </div>
+      <div class="masonry-item">
+        <img src="./image(8).png" alt="Laines" loading="lazy" />
+        <div class="masonry-caption">🧶 Fil de laine coloré</div>
+      </div>
+      <div class="masonry-item">
+        <img src="./image(9).png" alt="Cuivres" loading="lazy" />
+        <div class="masonry-caption">🥘 Cuivres & artisanat</div>
+      </div>
+      <div class="masonry-item">
+        <img src="./image(3).png" alt="Palais" loading="lazy" />
+        <div class="masonry-caption">🏛️ Architecture palatiale</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ SERVICES ═══════════════════════════════ -->
+<section class="py-24 md:py-32 px-6 md:px-12" id="services" style="background: var(--sable);">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-16 reveal">
+      <div class="section-label justify-center">
+        <span class="line"></span>
+        <span>Nos Services</span>
+        <span class="line"></span>
+      </div>
+      <h2 class="font-display text-4xl md:text-5xl font-medium">Vivez Marrakech autrement</h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="card-luxe reveal">
+        <div class="card-img-wrap">
+          <img src="./image(4).png" alt="Découverte" loading="lazy" />
+          <div class="card-img-overlay"></div>
+        </div>
+        <div class="p-8">
+          <span class="text-xs font-semibold tracking-widest uppercase" style="color: var(--terracotta);">Découverte</span>
+          <h3 class="font-display text-xl mt-2 mb-3">Marrakech petit budget</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            Découvrez l'essence de Marrakech sans vous ruiner. Itinéraires optimisés pour profiter au maximum avec un budget maîtrisé.
+          </p>
+        </div>
+      </div>
+
+      <div class="card-luxe reveal reveal-delay-1">
+        <div class="card-img-wrap">
+          <img src="./image(3).png" alt="Luxe" loading="lazy" />
+          <div class="card-img-overlay"></div>
+        </div>
+        <div class="p-8">
+          <span class="text-xs font-semibold tracking-widest uppercase" style="color: var(--terracotta);">Luxe</span>
+          <h3 class="font-display text-xl mt-2 mb-3">Séjour d'exception</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            Entre raffinement oriental et confort absolu. Profitez d'un séjour dans les plus beaux riads et palais de la Médina.
+          </p>
+        </div>
+      </div>
+
+      <div class="card-luxe reveal reveal-delay-2">
+        <div class="card-img-wrap">
+          <img src="./image(2).png" alt="Romantique" loading="lazy" />
+          <div class="card-img-overlay"></div>
+        </div>
+        <div class="p-8">
+          <span class="text-xs font-semibold tracking-widest uppercase" style="color: var(--terracotta);">Romantique</span>
+          <h3 class="font-display text-xl mt-2 mb-3">Week-end en amoureux</h3>
+          <p class="text-gray-500 text-sm leading-relaxed">
+            Dîners aux chandelles sur les rooftops, hammam en duo et balades au coucher du soleil dans les jardins secrets.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer class="py-16 px-6 md:px-12" style="background: var(--dark);">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid md:grid-cols-4 gap-12 mb-12">
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-9 h-9 rounded-full flex items-center justify-center" style="background: var(--terracotta);">
+            <svg viewBox="0 0 24 24" class="w-4 h-4 fill-white"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          </div>
+          <span class="font-display font-semibold text-white text-lg">Marrakech <span style="color: var(--terracotta);">Trip</span></span>
+        </div>
+        <p class="text-white/40 text-sm leading-relaxed max-w-sm">
+          Tourisme durable et conscient à Marrakech. Découvrez la Ville Rouge autrement, 
+          entre traditions, saveurs et ambiance unique.
+        </p>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold text-sm mb-4 tracking-wider uppercase">Explorer</h4>
+        <ul class="space-y-3">
+          <li><a href="#about" class="text-white/40 text-sm hover:text-terracotta transition-colors">À propos</a></li>
+          <li><a href="#itineraire" class="text-white/40 text-sm hover:text-terracotta transition-colors">Itinéraires</a></li>
+          <li><a href="#galerie" class="text-white/40 text-sm hover:text-terracotta transition-colors">Galerie</a></li>
+          <li><a href="#services" class="text-white/40 text-sm hover:text-terracotta transition-colors">Services</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold text-sm mb-4 tracking-wider uppercase">Contact</h4>
+        <ul class="space-y-3">
+          <li class="text-white/40 text-sm">Marrakech, Maroc</li>
+          <li class="text-white/40 text-sm">contact@marrakech-trip.com</li>
+          <li class="text-white/40 text-sm">+212 5XX-XXXXXX</li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-white/30 text-xs">Marrakech Éco-Guide IA · Tourisme durable · 2025</p>
+      <div class="flex gap-6">
+        <a href="#" class="text-white/30 text-xs hover:text-white transition-colors">Instagram</a>
+        <a href="#" class="text-white/30 text-xs hover:text-white transition-colors">Facebook</a>
+        <a href="#" class="text-white/30 text-xs hover:text-white transition-colors">Pinterest</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════ LOADER ═══════════════════════════════ -->
+<div class="loader-overlay" id="loaderOverlay">
+  <div class="spinner"></div>
+  <div class="loader-text">L'IA explore la Médina…</div>
+  <div class="loader-sub">Analyse des sentiers, éco-lieux et points d'ombre</div>
+</div>
+
+<!-- ═══════════════════════════════ JAVASCRIPT ═══════════════════════════════ -->
+<script>
+  const selectedTags = new Set();
+
+  function toggleTag(el, tag) {
+    if (selectedTags.has(tag)) {
+      selectedTags.delete(tag);
+      el.classList.remove('active');
+    } else {
+      selectedTags.add(tag);
+      el.classList.add('active');
+    }
+  }
+
+  function toggleMenu() {
+    document.getElementById('hamburger').classList.toggle('active');
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+
+  // Navbar scroll effect
+  window.addEventListener('scroll', () => {
+    const navbar = document.querySelector('.navbar');
+    if (window.scrollY > 50) {
+      navbar.classList.add('scrolled');
+    } else {
+      navbar.classList.remove('scrolled');
+    }
+  });
+
+  // Parallax hero
+  window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const heroBg = document.getElementById('heroBg');
+    if (heroBg) {
+      heroBg.style.transform = `translateY(${scrolled * 0.4}px)`;
+    }
+  });
+
+  // Intersection Observer for reveal animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  function handleGenerate(e) {
+    e.preventDefault();
+    const duration = document.getElementById('duration').value;
+    if (!duration) {
+      alert('Veuillez choisir une durée de séjour.');
+      return;
+    }
+
+    document.getElementById('loaderOverlay').classList.add('active');
+
+    setTimeout(() => {
+      document.getElementById('loaderOverlay').classList.remove('active');
+      generateResults(duration);
+    }, 2500);
+  }
+
+  function generateResults(duration) {
+    const mobility  = document.getElementById('mobility').checked;
+    const shade     = document.getElementById('shade').checked;
+    const interests = [...selectedTags];
+
+    const durationMap = { '2h':'½ journée','1j':'1 journée','2j':'Week-end','3j':'3 jours','5j':'5 jours' };
+    const durationLabel = durationMap[duration] || duration;
+
+    const allPlaces = [
+      {
+        name: 'Mosquée Koutoubia',
+        emoji: '🕌',
+        desc: "Joyau almoravide du XIIe siècle, le minaret le plus emblématique de Marrakech. Entourez-vous de ses jardins ombragés.",
+        score: 92,
+        time: '9h00',
+        img: './image.png',
+        category: 'Architecture'
+      },
+      {
+        name: 'Place Jemaa el-Fna',
+        emoji: '🎭',
+        desc: "Cœur vivant de la Médina classée UNESCO. Profitez des jus d'orange fraîchement pressés des marchands locaux.",
+        score: 85,
+        time: '10h30',
+        img: './image(2).png',
+        category: 'Histoire'
+      },
+      {
+        name: 'Palais de la Bahia',
+        emoji: '🏛️',
+        desc: "Chef-d'œuvre de l'architecture arabo-andalouse du XIXe siècle, ses patios ombrés et fontaines murmurent la splendeur des vizirs.",
+        score: 88,
+        time: '11h30',
+        img: './image(3).png',
+        category: 'Architecture'
+      },
+      {
+        name: 'Souks de la Médina',
+        emoji: '🪬',
+        desc: "Labyrinthes colorés où chaque ruelle réserve ses artisans : tanneurs, tisserands, potiers. Achats directement chez les créateurs.",
+        score: 79,
+        time: '14h00',
+        img: './image(1).png',
+        category: 'Artisanat'
+      },
+      {
+        name: 'Jardin des épices',
+        emoji: '🌿',
+        desc: "Déambulez au milieu des cônes d'épices colorés. Un spectacle visuel et olfactif unique au monde.",
+        score: 95,
+        time: '16h00',
+        img: './image(5).png',
+        category: 'Nature'
+      },
+      {
+        name: 'Artisanat du cuivre',
+        emoji: '🏯',
+        desc: "Admirez le travail des artisans du cuivre dans leurs ateliers traditionnels. Chaque pièce raconte une histoire.",
+        score: 91,
+        time: '17h30',
+        img: './image(9).png',
+        category: 'Histoire'
+      },
+    ];
+
+    const countMap = { '2h':3,'1j':6,'2j':6,'3j':6,'5j':6 };
+    const places = allPlaces.slice(0, countMap[duration] || 4);
+
+    const container = document.getElementById('results-container');
+    container.innerHTML = '';
+    places.forEach((place, i) => {
+      const card = document.createElement('div');
+      card.className = 'card-luxe reveal';
+      card.style.animationDelay = (i * 0.1) + 's';
+      card.innerHTML = `
+        <div class="card-img-wrap relative">
+          <img src="${place.img}" alt="${place.name}" loading="lazy" />
+          <div class="card-img-overlay"></div>
+          <div class="absolute top-4 right-4">
+            <span class="text-xs font-bold px-3 py-1.5 rounded text-white" style="background: var(--terracotta);">🌿 ${place.score}/100</span>
+          </div>
+          <div class="absolute bottom-4 left-4 text-white text-2xl">${place.emoji}</div>
+        </div>
+        <div class="p-6">
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <h3 class="font-display text-lg font-medium">${place.name}</h3>
+            <span class="text-xs font-medium px-2 py-1 rounded flex-shrink-0" style="background: var(--sable); color: var(--terracotta);">⏱ ${place.time}</span>
+          </div>
+          <p class="text-gray-500 text-sm leading-relaxed mb-4">${place.desc}</p>
+          <div class="flex items-center gap-3">
+            <div class="flex-1 eco-score-bar">
+              <div class="eco-score-fill" style="width: 0%" data-width="${place.score}%"></div>
+            </div>
+            <span class="text-xs font-semibold" style="color: var(--terracotta);">Éco ${place.score}%</span>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+      setTimeout(() => {
+        card.querySelector('.eco-score-fill').style.width = place.score + '%';
+      }, 100 + i * 100);
+    });
+
+    document.getElementById('results-subtitle').textContent =
+      `${places.length} étapes · ${durationLabel} · ${interests.length ? interests.join(', ') : 'Découverte générale'}`;
+
+    const access = [];
+    if (mobility) access.push('♿ adapté PMR');
+    if (shade) access.push('☂️ ombragé');
+    document.getElementById('eco-summary').textContent =
+      `Circuit de ${places.length} étapes optimisé pour une empreinte carbone minimale. Tous les déplacements sont à pied dans la Médina. ${access.length ? 'Adaptations : ' + access.join(' · ') + '.' : ''}`;
+
+    const resultsSection = document.getElementById('results-section');
+    resultsSection.classList.add('active');
+    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    document.querySelectorAll('#results-section .reveal').forEach(el => observer.observe(el));
+  }
+
+  function resetForm() {
+    document.getElementById('results-section').classList.remove('active');
+    document.getElementById('loaderOverlay').classList.remove('active');
+    window.scrollTo({ top: document.getElementById('itineraire').offsetTop - 80, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
